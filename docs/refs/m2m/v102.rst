@@ -1,0 +1,224 @@
+=====================
+M2M Data Format v1.02
+=====================
+
+A User-defined Sensor converts crawled data into the M2M data format,
+which is then used for Event Warehouse, MySQL, file, and SCN output.
+The M2M data format comprises a metadata section with sensor information
+in JSON format and a data section with the actual data.
+
+.. important::
+   **Changes in version 1.02**
+      * "latitude" and "longitude" values were moved from the metadata section to the data section.
+      * An "altitude" value was added to the data section.
+
+Metadata Section
+================
+
+A sample metadata section is shown below.
+
+.. code-block:: json
+   
+   {
+        "primary": {
+            "format_version": 1.02,
+            "title": "ExampleHttpSensor",
+            "provenance": {
+                "source": {
+                    "info": "http://example.com/sample-rainfall/pre1h/20140809T0900.html",
+                    "contact": ""
+                },
+                "create_by": {
+                    "contact": "Test User<testuser@example.com>",
+                    "time": "2015-03-30 20:10:41.034000"
+                }
+            },
+            "tag": "",
+            "timezone": "+09:00",
+            "security": "public",
+            "id": "http://m2m.nict.go.jp/m2m_data/?id=ExampleHttpSensor20150330201041033000"
+        },
+        "sensor_info": {
+            "data_hash": "8dff994f22ebbedd30fe570daa584f1e",
+            "data_link": {
+                "uri": "C:\\_Git_\\uds2-sdk/_out/m2m_data\\ExampleHttpSensor20150330201033/0000000000/M2MDataExampleHttpSensor20150330201041033000.json",
+                "data_id": "ExampleHttpSensor20150330201041033000"
+            },
+            "data_format": "json",
+            "device_info": {
+                "name": null,
+                "serial_no": null,
+                "capability": {
+                    "frequency": {
+                        "count": 10,
+                        "type": "seconds"
+                    }
+                },
+                "ownership": null,
+                "ipaddress": null,
+                "id": null
+            },
+            "data_profile": "Weather",
+            "data_size": 2173,
+            "schema": [
+                {
+                    "type": "string",
+                    "name": "time"
+                },
+                {
+                    "type": "numeric",
+                    "name": "longitude",
+                    "unit": "degree"
+                },
+                {
+                    "type": "numeric",
+                    "name": "latitude",
+                    "unit": "degree"
+                },
+                {
+                    "type": "numeric",
+                    "name": "altitude",
+                    "unit": "m"
+                },
+                {
+                    "type": "numeric",
+                    "name": "rainfall",
+                    "unit": "mm"
+                },
+                {
+                    "type": "string",
+                    "name": "city_name"
+                },
+                {
+                    "type": "string",
+                    "name": "station_name"
+                }
+            ]
+        }
+    }
+   
+
+===  =====================  ==========  ============================================================
+No.  Item                   Required?   Description
+===  =====================  ==========  ============================================================
+1.   primary                Yes         |
+
+2.   　　format_version     Yes         | The M2M data format version.
+
+3.   　　title              Yes         | The sensor name.
+
+4.   　　provenance         Yes         | The provenance of the M2M data.
+
+5.   　　tag                No          | Arbitrary user-specified information.
+
+6.   　　timezone           Yes         | A time zone.
+                                        | A single M2M data format shares the same time zone.
+
+7.   　　id                 Yes         | The data's ID.
+
+8.   sensor_info            Yes         | Information on the sensor and its data.
+
+9.   　　data_hash          Yes         | The data's hash value.
+
+10.  　　data_link          Yes         | The location where the data section is stored.
+                                        | "uri" indicates the location;
+                                        | this will be "next_data" if data is streaming.
+                                        | "data_id" is an ID linked to the data section;
+                                        | the same ID is also stored in the data section.
+
+11.  　　data_format        Yes         | The format of the data in the data section.
+
+12.  　　device_info        Yes         | Sensor information.
+
+13.  　　data_profile       Yes         | The data's profile (in this case, "weather").
+
+14.  　　data_size          Yes         | The size of the data section.
+
+15.  　　schema             Yes(`*1`)   | Information on the data section’s schema.
+                                        | In the weather profile, the data section holds JSON data.
+                                        | This shows the structure of the data section.
+
+16.  　　　　type           Yes(`*1`)   | A data type. The weather profile uses the following values.
+                                        | -- "numeric" for numbers
+                                        | -- "string" for strings
+
+17.  　　　　name           Yes(`*1`)   | The data's name.
+
+18.  　　　　unit           No          | The units in which the data is measured.
+===  =====================  ==========  ============================================================
+
+| `*1`　This is required for the weather profile.
+| `*2`　Any data that does not appear in the table above is additional information
+  that can change from one instance of data to the next.
+
+|
+
+Data Section
+============
+
+The data section's format depends on the metadata's "profile".
+An example for the "weather" profile is shown below.
+
+.. code-block:: json
+   
+   {
+        "data": {
+            "values": [
+                {
+                    "rainfall": 4.9,
+                    "altitude": null,
+                    "longitude": 135.761,
+                    "city_name": "Kyoto",
+                    "time": "2014-08-09T09:00:00.000",
+                    "latitude": 34.8028,
+                    "station_name": "Kyotanabe"
+                },
+                {
+                    "rainfall": 4.9,
+                    "altitude": null,
+                    "longitude": 135.68,
+                    "city_name": "Kyoto",
+                    "time": "2014-08-09T09:00:00.000",
+                    "latitude": 34.9243,
+                    "station_name": "Nagaokakyo"
+                },
+                {
+                    "rainfall": 4.8,
+                    "altitude": null,
+                    "longitude": 135.436,
+                    "city_name": "Kyoto",
+                    "time": "2014-08-09T09:00:00.000",
+                    "latitude": 35.0699,
+                    "station_name": "Sonobe"
+                },
+                {
+                    "rainfall": 1.5,
+                    "altitude": null,
+                    "longitude": 135.055,
+                    "city_name": "Kyoto",
+                    "time": "2014-08-09T09:00:00.000",
+                    "latitude": 35.597,
+                    "station_name": "Mineyama"
+                }
+            ],
+            "data_id": "ExampleHttpSensor20150330201041033000"
+        }
+    }
+
+===  ==================  =========  ==========
+No.  Item                Required?  Description
+===  ==================  =========  ==========
+1.    data               Yes(`*1`)  The data section.
+2.    　　values         Yes(`*1`)  The actual data.
+3.        　　time       Yes(`*1`)  The time at which the sensor data was recorded.
+4.    　　　　longitude  Yes        Longitude coordinates.
+5.    　　　　latitude   Yes        Latitude coordinates.
+6.    　　　　altitude   Yes        An altitude, or "null" for data without an altitude.
+7.    data_id            Yes(`*1`)  The data's ID, which is linked to the metadata.
+===  ==================  =========  ==========
+
+| `*1`　This is required for the “weather” profile.
+| `*2`　Item names are written in snake case (with elements separated by underscores).
+| `*3`　Note that "time" indicates when the data was recorded, not when the website was updated.
+
+|

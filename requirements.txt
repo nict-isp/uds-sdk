@@ -1,0 +1,10 @@
+beautifulsoup==3.2.1
+bunch==1.0.1
+lxml==3.2.5
+MySQL-python==1.2.3
+python-dateutil==2.2
+python-placemaker==0.1.0
+pytz==2013.9
+simplejson==3.3.3
+suds==0.4
+tweepy==2.2

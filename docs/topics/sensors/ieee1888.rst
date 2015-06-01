@@ -1,0 +1,151 @@
+IEEE1888Sensor Class
+====================
+
+.. contents::
+   :depth: 2
+
+**Related Topics**
+    :API Reference: :ref:`sensors-api` » :class:`~uds.sensors.ieee1888.IEEE1888Sensor`
+    :Example:        :doc:`/refs/examples/ieee1888_sensor`
+
+:class:`~uds.sensors.ieee1888.IEEE1888Sensor` fetches data
+using the IEEE 1888 protocol for transfer sensing data and control data.
+To extend the IEEE1888Sensor class and implement your own sensor class,
+configure runtime parameters and override methods as follows.
+
+.. code-block:: python
+
+    from uds.sensors.ieee1888 import IEEE1888Sensor
+
+    class MyIEEE1888Sensor(IEEE1888Sensor):
+
+        def __init__(self, project_home):
+            super(MyIEEE1888Sensor, self).__init__(project_home)
+
+            # ~~~ Initialize sensor parameters here ~~~
+
+            pass
+
+        # Method overriding (mandatory)
+        def create_query_keys(self):...
+
+        # Method overriding (mandatory)
+        def parse_response(self, content, url):...
+
+        # Method overriding (optional)
+        def before_cycle(self):...
+
+        # Method overriding (optional)
+        def after_cycle(self):...
+
+        # Method overriding (optional)
+        def open(self):...
+
+        # Method overriding (optional)
+        def close(self):...
+
+Configuring parameters Shared with the Sensor Class
+---------------------------------------------------
+
+Configure the following parameters just as you would for an implementation of the Sensor class.
+
+* :ref:`base-params-guide`
+
+* :ref:`m2m-info-guide`
+
+* :ref:`m2m-data-schema-guide`
+
+* :ref:`store-params-guide`
+
+Configuring the WDSL Address
+----------------------------
+
+Use the :attr:`~uds.sensors.ieee1888.IEEE1888Sensor.wsdl_url` property
+to configure the WSDL URL (with definitions of SOAP operations).
+The WSDL is only retrieved once—when a sensor is initialized.
+
+.. code-block:: python
+
+    self.wsdl_url = 'http://ieee1888.example.com/test1/services/FIAPStorage?wsdl'
+
+Overriding the create_query_key Method
+--------------------------------------
+
+Override the IEEE1888Sensor class’s abstract
+:meth:`~uds.sensors.ieee1888.IEEE1888Sensor.create_query_keys` method
+with an implementation that creates query parameters for fetching data via SOAP.
+
+Your implementation should:
+
+#.  Return a list of dictionaries created for Key classes that conform to the IEEE 1888 protocol.
+
+Sample implementation:
+
+.. code-block:: python
+
+    # Create keys to fetch assumed data from assumed Web API.
+    def create_query_keys(self):
+        key1 = {
+            '_attrName' :'time',
+            '_id' : 'http://ieee1888.example.com/weather/01001/airtmp',
+            '_select' : 'maximum'
+        }
+        keys.append(key1)
+
+        key2 = {
+            '_attrName': 'time',
+            '_id': 'http://ieee1888.example.com/weather/01001/apress',
+            '_lt': '2013-10-02 00:00:00+09:00',
+            '_gteq': '2013-10-01 23:00:00+09:00'
+        }
+        keys.append(key2)
+
+        return keys
+
+The create_query_keys() method is only called once per crawl cycle.
+If you would like to change your query each time you fetch data,
+your implementation should return a different value for each cycle.
+
+Overriding the parse_response Method
+------------------------------------
+
+Override the IEEE1888Sensor class’s abstract
+:meth:`~uds.sensors.ieee1888.IEEE1888Sensor.parse_response` method
+to implement the data extraction process.
+
+Your implementation should:
+
+#.  Accept responses from the IEEE 1888 protocol as a dictionary in the first argument (*response*).
+
+#.  Extract the desired data from the *response* variable.
+
+#.  Store the extracted data in :class:`~uds.data.M2MData` objects.
+
+#.  Return list of M2MData objects.
+
+Sample implementation:
+
+.. code-block:: python
+
+    def parse_response(self, response):
+        m2m_data_list = []
+        m2m_data = self.data_builder.create_m2m_data()
+
+        # Extract the desired data from the response variable.
+        for point in enumerate(response['body']['point']):
+            datum = {}
+            datum['time'] = self._extract_time(point)
+            datum['longitude'] = self._extract_longitude(point)
+            datum['latitude'] = self._extract_latitude(point)
+            datum['altitude'] = self._extract_altitude(point)
+            datum['airtmp'] = self._extract_value(point)
+            m2m_data.append(datum)
+
+        m2m_data_list.append(m2m_data)
+        return m2m_data_list
+
+
+Example Implementation
+----------------------
+
+:doc:`/refs/examples/ieee1888_sensor`

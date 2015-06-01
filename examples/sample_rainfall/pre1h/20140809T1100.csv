@@ -1,0 +1,18 @@
+Prefecture,Station,Rainfall(mm),Comment
+Kyoto,Taiza,15,Test data.
+Kyoto,Mineyama,13.5,Test data.
+Kyoto,Miyazu,13,Test data.
+Kyoto,Sakaura,13,Test data.
+Kyoto,Maizuru,12,Test data.
+Kyoto,Mutsuyori,11.5,Test data.
+Kyoto,Fukuchiyama,15.4,Test data.
+Kyoto,Ayabe,14.2,Test data.
+Kyoto,Miwa,18.5,Test data.
+Kyoto,Honsho,19.4,Test data.
+Kyoto,Miyama,14.6,Test data.
+Kyoto,Shuchi,15.6,Test data.
+Kyoto,Sonobe,15.8,Test data.
+Kyoto,Keihoku,15.9,Test data.
+Kyoto,Kyoto,15.9,Test data.
+Kyoto,Soyamisaki,16.9,Test data. Geocoding fail case.
+Kyoto,Kyotanabe,17.9,Test data.
